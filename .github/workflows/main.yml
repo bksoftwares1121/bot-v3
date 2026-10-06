@@ -1,0 +1,24 @@
+name: Cloud Bot
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */6 * * *'
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install playwright requests
+      - run: playwright install --with-deps chromium firefox webkit
+      - run: python bot.py
+      - run: |
+          git config --global user.name 'Action'
+          git config --global user.email 'action@github.com'
+          git add views.txt
+          git commit -m "Update" || exit 0
+          git push
